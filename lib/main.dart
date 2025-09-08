@@ -149,18 +149,22 @@ class _WeatherAppState extends State<WeatherApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Weather App')),
+      appBar: AppBar(
+        title: Text('ATMOS', style: TextStyle(fontFamily: 'Roboto')),
+        centerTitle: true,
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text("Srawana"),
+              accountName: Text(
+                "Atomos",
+                style: TextStyle(fontFamily: 'Roboto'),
+              ),
               accountEmail: Text("example@email.com"),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: AssetImage(
-                  'assets/images/81fdb4ad5a1008865197b7132a5f565c.jpg',
-                ),
+                backgroundColor: Colors.lightBlue,
               ),
             ),
             ListTile(
@@ -236,6 +240,7 @@ class _WeatherAppState extends State<WeatherApp> {
                                         color: Color(0XFF18233E),
                                         fontSize: 20,
                                         fontWeight: FontWeight.w700,
+                                        fontFamily: 'Roboto',
                                       ),
                                     ),
                                     Text(
@@ -337,9 +342,23 @@ class _WeatherAppState extends State<WeatherApp> {
                                   return const CircularProgressIndicator();
                                 } else if (snapshot.hasError) {
                                   return Center(
-                                    child: Text(
-                                      snapshot.error.toString(),
-                                      style: TextStyle(color: Colors.red),
+                                    child: Center(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade300,
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Something went wrong',
+                                          style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            color: Colors.red,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   );
                                 } else if (snapshot.hasData) {
