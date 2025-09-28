@@ -148,6 +148,9 @@ class _WeatherAppState extends State<WeatherApp> {
   TextEditingController cityName = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text('ATMOS', style: TextStyle(fontFamily: 'Roboto')),
@@ -232,27 +235,7 @@ class _WeatherAppState extends State<WeatherApp> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  children: [
-                                    Text(
-                                      'January 2022',
-                                      style: TextStyle(
-                                        color: Color(0XFF18233E),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Roboto',
-                                      ),
-                                    ),
-                                    Text(
-                                      'Thursday, Jan 4,2022',
-                                      style: TextStyle(
-                                        fontSize: 10.0,
-                                        fontFamily: 'Roboto',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(width: 70),
+                                SizedBox(width: width * 0.0512),
                                 Expanded(
                                   child: TextField(
                                     controller: cityName,
@@ -285,78 +268,131 @@ class _WeatherAppState extends State<WeatherApp> {
                                     },
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () async {
-                                    final weather = await fetchData();
-                                    setState(() {
-                                      futureWeather = Future.value(weather);
-                                      forcast = fetchDailyTemperatire(
-                                        weather.lat,
-                                        weather.lon,
-                                      );
-                                    });
-                                  },
-                                  icon: Icon(Icons.search_rounded),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: width * 0.08,
+                                    maxHeight: height * 0.08,
+                                  ),
+                                  child: FittedBox(
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        final weather = await fetchData();
+                                        setState(() {
+                                          futureWeather = Future.value(weather);
+                                          forcast = fetchDailyTemperatire(
+                                            weather.lat,
+                                            weather.lon,
+                                          );
+                                        });
+                                      },
+                                      icon: Icon(Icons.search_rounded),
+                                    ),
+                                  ),
                                 ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.notifications),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: width * 0.08,
+                                    maxHeight: height * 0.08,
+                                  ),
+                                  child: FittedBox(
+                                    child: IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(Icons.notifications),
+                                    ),
+                                  ),
                                 ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.person),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: width * 0.08,
+                                    maxHeight: height * 0.08,
+                                  ),
+                                  child: FittedBox(
+                                    child: IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(Icons.person),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                            SizedBox(height: 35),
+                            SizedBox(height: height * 0.0455),
                             Divider(thickness: 2),
                             ListTile(
-                              leading: Text(
-                                'Today overview',
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0XFF18233E),
+                              title: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: width * 0.7,
+                                ),
+                                child: Text(
+                                  'Today overview',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF18233E),
+                                  ),
                                 ),
                               ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'More detail',
-                                    style: TextStyle(color: Color(0xFF6D86BD)),
-                                  ),
-                                  Icon(
-                                    Icons.more_horiz,
-                                    color: Color(0xFF6D86BD),
-                                  ),
-                                ],
+                              trailing: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: width * 0.3,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'More detail',
+                                      style: TextStyle(
+                                        color: Color(0xFF6D86BD),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.more_horiz,
+                                      color: Color(0xFF6D86BD),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             FutureBuilder(
                               future: futureWeather,
                               builder: (context, snapshot) {
+                                // Get screen size once at the top
+                                double screenWidth =
+                                    MediaQuery.of(context).size.width;
+                                double screenHeight =
+                                    MediaQuery.of(context).size.height;
+
+                                // Pick breakpoint where layout switches
+                                bool isWideScreen = screenWidth > 600;
+
+                                // Card width and spacing change depending on screen width
+                                double cardWidth =
+                                    (isWideScreen
+                                            ? screenWidth * 0.2196
+                                            : screenWidth * 0.9)
+                                        .toDouble();
+                                double cardSpacing =
+                                    (isWideScreen ? screenWidth * 0.0366 : 0)
+                                        .toDouble();
+                                double sideSpacing =
+                                    (isWideScreen ? screenWidth * 0.0146 : 0)
+                                        .toDouble();
+
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
                                   return const CircularProgressIndicator();
                                 } else if (snapshot.hasError) {
                                   return Center(
-                                    child: Center(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade300,
-                                          borderRadius: BorderRadius.circular(
-                                            5,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'Something went wrong',
-                                          style: TextStyle(
-                                            fontFamily: 'Roboto',
-                                            color: Colors.red,
-                                            fontSize: 15,
-                                          ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: const Text(
+                                        'Something went wrong',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          color: Colors.red,
                                         ),
                                       ),
                                     ),
@@ -365,12 +401,16 @@ class _WeatherAppState extends State<WeatherApp> {
                                   var weather = snapshot.data;
                                   return Column(
                                     children: [
-                                      Row(
+                                      Wrap(
+                                        direction: Axis.horizontal,
+                                        runSpacing: 8,
                                         children: [
-                                          SizedBox(width: 20),
+                                          SizedBox(width: sideSpacing),
                                           SizedBox(
-                                            width: 300,
-                                            height: 100,
+                                            width: cardWidth,
+                                            height:
+                                                (screenHeight * 0.13)
+                                                    .toDouble(),
                                             child: Center(
                                               child: Card(
                                                 elevation: 0,
@@ -381,42 +421,81 @@ class _WeatherAppState extends State<WeatherApp> {
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      Icon(
-                                                        WeatherIcons
-                                                            .wind_beaufort_0,
-                                                        color: Color(
-                                                          0XFF6D86BD,
+                                                      ConstrainedBox(
+                                                        constraints:
+                                                            BoxConstraints(
+                                                              maxWidth:
+                                                                  (screenWidth *
+                                                                          0.1)
+                                                                      .toDouble(),
+                                                            ),
+                                                        child: const Icon(
+                                                          WeatherIcons
+                                                              .wind_beaufort_0,
+                                                          color: Color(
+                                                            0XFF6D86BD,
+                                                          ),
                                                         ),
                                                       ),
-                                                      SizedBox(width: 15),
+                                                      SizedBox(
+                                                        width:
+                                                            (screenWidth *
+                                                                    0.011)
+                                                                .toDouble(),
+                                                      ),
                                                       Padding(
                                                         padding:
                                                             const EdgeInsets.only(
                                                               top: 15,
                                                             ),
                                                         child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            Text(
-                                                              'Wind Speed',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Roboto',
-                                                                color:
-                                                                    Colors
-                                                                        .grey
-                                                                        .shade600,
+                                                            ConstrainedBox(
+                                                              constraints: BoxConstraints(
+                                                                maxWidth:
+                                                                    (screenWidth *
+                                                                            0.3)
+                                                                        .toDouble(),
+                                                              ),
+                                                              child: const Text(
+                                                                'Wind Speed',
+                                                                softWrap: true,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Roboto',
+                                                                  color: Color(
+                                                                    0xFF888888,
+                                                                  ),
+                                                                ),
                                                               ),
                                                             ),
-                                                            SizedBox(width: 10),
-                                                            Text(
-                                                              '${weather?.windSpeed}km/h',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Roboto',
-                                                                fontSize: 20,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
+                                                            ConstrainedBox(
+                                                              constraints: BoxConstraints(
+                                                                maxWidth:
+                                                                    (screenWidth *
+                                                                            0.3)
+                                                                        .toDouble(),
+                                                              ),
+                                                              child: Text(
+                                                                '${weather?.windSpeed}km/h',
+                                                                softWrap: true,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: const TextStyle(
+                                                                  fontFamily:
+                                                                      'Roboto',
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -428,10 +507,13 @@ class _WeatherAppState extends State<WeatherApp> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: 50),
+                                          SizedBox(width: cardSpacing),
+                                          // second card …
                                           SizedBox(
-                                            width: 300,
-                                            height: 100,
+                                            width: cardWidth,
+                                            height:
+                                                (screenHeight * 0.13)
+                                                    .toDouble(),
                                             child: Center(
                                               child: Card(
                                                 elevation: 0,
@@ -442,41 +524,82 @@ class _WeatherAppState extends State<WeatherApp> {
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      Icon(
-                                                        WeatherIcons.barometer,
-                                                        color: Color(
-                                                          0XFF6D86BD,
+                                                      ConstrainedBox(
+                                                        constraints:
+                                                            BoxConstraints(
+                                                              maxWidth:
+                                                                  (screenWidth *
+                                                                          0.1)
+                                                                      .toDouble(),
+                                                            ),
+                                                        child: const Icon(
+                                                          WeatherIcons
+                                                              .barometer,
+                                                          color: Color(
+                                                            0XFF6D86BD,
+                                                          ),
                                                         ),
                                                       ),
-                                                      SizedBox(width: 15),
+                                                      SizedBox(
+                                                        width:
+                                                            (screenWidth *
+                                                                    0.011)
+                                                                .toDouble(),
+                                                      ),
                                                       Padding(
                                                         padding:
                                                             const EdgeInsets.only(
                                                               top: 15,
                                                             ),
                                                         child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            Text(
-                                                              'Pressure',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Roboto',
-                                                                color:
-                                                                    Colors
-                                                                        .grey
-                                                                        .shade600,
+                                                            ConstrainedBox(
+                                                              constraints: BoxConstraints(
+                                                                maxWidth:
+                                                                    (screenWidth *
+                                                                            0.3)
+                                                                        .toDouble(),
+                                                              ),
+                                                              child: const Text(
+                                                                'Pressure',
+                                                                softWrap: true,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Roboto',
+                                                                  fontSize: 15,
+                                                                  color: Color(
+                                                                    0xFF888888,
+                                                                  ),
+                                                                ),
                                                               ),
                                                             ),
-                                                            SizedBox(width: 10),
-                                                            Text(
-                                                              '${weather?.pressure} hpa',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Roboto',
-                                                                fontSize: 20,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
+                                                            ConstrainedBox(
+                                                              constraints: BoxConstraints(
+                                                                maxWidth:
+                                                                    (screenWidth *
+                                                                            0.3)
+                                                                        .toDouble(),
+                                                              ),
+                                                              child: Text(
+                                                                '${weather?.pressure} hpa',
+                                                                softWrap: true,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: const TextStyle(
+                                                                  fontFamily:
+                                                                      'Roboto',
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -490,12 +613,17 @@ class _WeatherAppState extends State<WeatherApp> {
                                           ),
                                         ],
                                       ),
-                                      Row(
+                                      // second row
+                                      Wrap(
+                                        direction: Axis.horizontal,
+                                        runSpacing: 8,
                                         children: [
-                                          SizedBox(width: 20),
+                                          SizedBox(width: sideSpacing),
                                           SizedBox(
-                                            width: 300,
-                                            height: 100,
+                                            width: cardWidth,
+                                            height:
+                                                (screenHeight * 0.13)
+                                                    .toDouble(),
                                             child: Center(
                                               child: Card(
                                                 elevation: 0,
@@ -506,38 +634,49 @@ class _WeatherAppState extends State<WeatherApp> {
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      Icon(
+                                                      const Icon(
                                                         WeatherIcons.humidity,
                                                         color: Color(
                                                           0XFF6D86BD,
                                                         ),
                                                       ),
-                                                      SizedBox(width: 15),
+                                                      SizedBox(
+                                                        width:
+                                                            (screenWidth *
+                                                                    0.011)
+                                                                .toDouble(),
+                                                      ),
                                                       Padding(
                                                         padding:
                                                             const EdgeInsets.only(
                                                               top: 15,
                                                             ),
                                                         child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            Text(
+                                                            const Text(
                                                               'Humidity',
+                                                              softWrap: true,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                               style: TextStyle(
                                                                 fontFamily:
                                                                     'Roboto',
-                                                                color:
-                                                                    Colors
-                                                                        .grey
-                                                                        .shade600,
+                                                                fontSize: 15,
+                                                                color: Color(
+                                                                  0xFF888888,
+                                                                ),
                                                               ),
                                                             ),
-                                                            SizedBox(width: 10),
                                                             Text(
                                                               '${weather?.humidity}%',
-                                                              style: TextStyle(
+                                                              style: const TextStyle(
                                                                 fontFamily:
                                                                     'Roboto',
-                                                                fontSize: 20,
+                                                                fontSize: 15,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w600,
@@ -552,10 +691,12 @@ class _WeatherAppState extends State<WeatherApp> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: 50),
+                                          SizedBox(width: cardSpacing),
                                           SizedBox(
-                                            width: 300,
-                                            height: 100,
+                                            width: cardWidth,
+                                            height:
+                                                (screenHeight * 0.13)
+                                                    .toDouble(),
                                             child: Center(
                                               child: Card(
                                                 elevation: 0,
@@ -566,39 +707,50 @@ class _WeatherAppState extends State<WeatherApp> {
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      Icon(
+                                                      const Icon(
                                                         WeatherIcons
                                                             .thermometer_internal,
                                                         color: Color(
                                                           0XFF6D86BD,
                                                         ),
                                                       ),
-                                                      SizedBox(width: 15),
+                                                      SizedBox(
+                                                        width:
+                                                            (screenWidth *
+                                                                    0.011)
+                                                                .toDouble(),
+                                                      ),
                                                       Padding(
                                                         padding:
                                                             const EdgeInsets.only(
                                                               top: 15,
                                                             ),
                                                         child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            Text(
+                                                            const Text(
                                                               'Min Temp',
+                                                              softWrap: true,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                               style: TextStyle(
                                                                 fontFamily:
                                                                     'Roboto',
-                                                                color:
-                                                                    Colors
-                                                                        .grey
-                                                                        .shade600,
+                                                                fontSize: 15,
+                                                                color: Color(
+                                                                  0xFF888888,
+                                                                ),
                                                               ),
                                                             ),
-                                                            SizedBox(width: 10),
                                                             Text(
                                                               '${weather?.minTemp} C',
-                                                              style: TextStyle(
+                                                              style: const TextStyle(
                                                                 fontFamily:
                                                                     'Roboto',
-                                                                fontSize: 20,
+                                                                fontSize: 15,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w600,
@@ -618,9 +770,10 @@ class _WeatherAppState extends State<WeatherApp> {
                                     ],
                                   );
                                 }
-                                return SizedBox();
+                                return const SizedBox();
                               },
                             ),
+
                             FutureBuilder<List<DailyForecast>>(
                               future: forcast,
                               builder: (context, snapshot) {
@@ -635,7 +788,7 @@ class _WeatherAppState extends State<WeatherApp> {
                                   final threeDaysWeather =
                                       snapshot.data!; // safe to use ! here
                                   return SizedBox(
-                                    height: 250,
+                                    height: height * 0.3255,
                                     child: SfCartesianChart(
                                       primaryXAxis: CategoryAxis(),
                                       title: ChartTitle(
@@ -710,31 +863,48 @@ class _WeatherAppState extends State<WeatherApp> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '${rightWeather?.name}',
-                                    style: TextStyle(
-                                      fontFamily: 'Roboto',
-                                      fontWeight: FontWeight.w300,
-                                      color: Colors.white,
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: width * 0.1,
                                     ),
-                                  ),
-                                  Text(
-                                    '${rightWeather?.location}',
-                                    style: TextStyle(
-                                      color: Colors.grey.shade300,
-                                      fontFamily: 'Roboto',
-                                      fontWeight: FontWeight.w300,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          'https://openweathermap.org/img/wn/${rightWeather?.icon}@2x.png',
+                                    child: FittedBox(
+                                      child: Text(
+                                        '${rightWeather?.name}',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.w300,
+                                          color: Colors.white,
                                         ),
-                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: width * 0.1,
+                                    ),
+                                    child: Text(
+                                      '${rightWeather?.location}',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade300,
+                                        fontFamily: 'Roboto',
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    ),
+                                  ),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: width * 0.1,
+                                    ),
+                                    child: Container(
+                                      width: width * 0.037,
+                                      height: height * 0.065,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                            'https://openweathermap.org/img/wn/${rightWeather?.icon}@2x.png',
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -742,27 +912,38 @@ class _WeatherAppState extends State<WeatherApp> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        '${rightWeather?.temperature}C',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.w200,
-                                          fontSize: 25,
-                                          color: Colors.white,
+                                      ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: width * 0.1,
+                                        ),
+                                        child: Text(
+                                          '${rightWeather?.temperature}C',
+                                          style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontWeight: FontWeight.w200,
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
-                                      Text(
-                                        '${rightWeather?.cloud}',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                      ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: width * 0.1,
+                                        ),
+                                        child: Text(
+                                          '${rightWeather?.cloud}',
+                                          style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
                                   Divider(),
-                                  SizedBox(height: 10),
+                                  SizedBox(height: height * 0.013),
                                 ],
                               ),
                             );
